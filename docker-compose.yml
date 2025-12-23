@@ -1,6 +1,6 @@
 services:
   nginx-egress:
-    image: adysis/haproxy-side:v1.6.4
+    image: adysis/haproxy-side-pbc:v1.0.1
     environment:
       SECRET_HEADER_NAME: ${SECRET_HEADER_NAME}
       SECRET_HEADER_VALUE: ${SECRET_HEADER_VALUE}
