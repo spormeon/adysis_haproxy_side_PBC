@@ -1,0 +1,11 @@
+services:
+  nginx-egress:
+    image: adysis/haproxy-side:v1.6.4
+    environment:
+      SECRET_HEADER_NAME: ${SECRET_HEADER_NAME}
+      SECRET_HEADER_VALUE: ${SECRET_HEADER_VALUE}
+      # READY_PROBE_HOST: ${READY_PROBE_HOST}
+    ports:
+      - "8709:8709"
+    restart: always
+    network_mode: host
