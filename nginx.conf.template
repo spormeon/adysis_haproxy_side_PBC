@@ -1,0 +1,68 @@
+server {
+  listen 127.0.0.1:${PORT};
+
+  allow 127.0.0.1;
+  deny all;
+
+  access_log off;
+  error_log /dev/stderr warn;
+
+  # log only non-2xx/3xx responses
+  # access_log /dev/stdout main if=$log_bad;
+
+  set $log_bad 0;
+  # if ($status !~ "^[23]") { set $log_bad 1; }
+
+  # Local-only endpoint for HAProxy health checks
+  location = /status {
+
+    access_log off;
+    error_log off;
+
+    # This is the slot hostname for THIS port, e.g. pbs-europe-7.adysis.com
+    set $upstream "${SLOT_HOST}";
+    # set $upstream "pbs-europe-1.adysis.com";
+
+    # Probe the real PBS /status on the Bunny MC
+    proxy_pass http://$upstream/status;
+
+    # Critical: must be the slot host Bunny expects for routing
+    proxy_set_header Host $upstream;
+
+    # Your secret header (so Bunny MC allows it)
+    proxy_set_header ${SECRET_HEADER_NAME} "${SECRET_HEADER_VALUE}";
+
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+
+    proxy_connect_timeout 2s;
+    proxy_send_timeout 3s;
+    proxy_read_timeout 3s;
+
+    # If upstream fails, return 503 so HAProxy marks DOWN
+    proxy_intercept_errors on;
+    error_page 400 401 403 404 500 502 503 504 = @down;
+  }
+
+  location @down {
+    access_log off;
+    error_log off;
+    return 503 "down\n";
+  }
+
+
+  location / {
+
+    access_log off;
+
+    set $upstream "${SLOT_HOST}";
+    proxy_pass http://$upstream;
+    proxy_set_header Host $upstream;
+    proxy_set_header ${SECRET_HEADER_NAME} "${SECRET_HEADER_VALUE}";
+    proxy_http_version 1.1;
+    proxy_set_header Connection "";
+    proxy_connect_timeout 2s;
+    proxy_send_timeout 10s;
+    proxy_read_timeout 10s;
+  }
+}
