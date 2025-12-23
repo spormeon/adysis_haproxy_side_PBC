@@ -19,12 +19,12 @@ server {
     access_log off;
     error_log off;
 
-    # This is the slot hostname for THIS port, e.g. pbs-europe-7.adysis.com
+    # This is the slot hostname for THIS port, e.g. pbc-europe-7.adysis.com
     set $upstream "${SLOT_HOST}";
-    # set $upstream "pbs-europe-1.adysis.com";
+    # set $upstream "pbc-europe-1.adysis.com";
 
-    # Probe the real PBS /status on the Bunny MC
-    proxy_pass http://$upstream/status;
+    # Probe the real PBC /status on the Bunny MC
+    proxy_pass https://$upstream/version;
 
     # Critical: must be the slot host Bunny expects for routing
     proxy_set_header Host $upstream;
