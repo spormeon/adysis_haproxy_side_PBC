@@ -1,0 +1,23 @@
+server {
+  listen 0.0.0.0:8709;
+
+  access_log off;
+
+  location = /healthz {
+    access_log /dev/stdout main;
+    return 200 "ok\n"; 
+  }
+  location = /livez   {
+    access_log /dev/stdout main;
+    return 200 "ok\n"; 
+  }
+  location = /readyz {
+    access_log /dev/stdout main;
+    return 200 "ready\n"; 
+  }
+
+  location @notready {
+    access_log /dev/stdout main;
+    return 503 "not-ready\n";
+  }
+}
