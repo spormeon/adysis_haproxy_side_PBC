@@ -1,5 +1,6 @@
 server {
-  listen 0.0.0.0:8709;
+  # listen 0.0.0.0:8709;
+  listen 127.0.0.1:8709;
 
   access_log off;
 
